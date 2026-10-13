@@ -1,0 +1,53 @@
+// ==========================================
+// ESQUEMA: CREAR Y MOSTRAR UN HUD DESDE C++
+// ==========================================
+
+// --- 1. ARCHIVO DE CABECERA (.h) ---
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "TuClase.generated.h" // <-- SIEMPRE el último include
+
+UCLASS()
+class TUJUEGO_API ATuClase : public AActor
+{
+    GENERATED_BODY()
+    
+public: 
+    ATuClase();
+    virtual void BeginPlay() override;
+
+    // Expone la variable en el editor para arrastrar/seleccionar tu WBP_HUD
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<class UUserWidget> ClaseHUD;
+};
+
+
+// --- 2. ARCHIVO DE IMPLEMENTACIÓN (.cpp) ---
+#include "TuClase.h"
+#include "Blueprint/UserWidget.h" // <-- Librería obligatoria para manejar Widgets
+
+ATuClase::ATuClase()
+{
+    // Desactivamos el Tick si no vamos a actualizar lógica por fotograma
+    PrimaryActorTick.bCanEverTick = false;
+}
+
+void ATuClase::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // 1. Verificamos que se haya asignado una clase de HUD en el editor
+    if (ClaseHUD)
+    {
+        // 2. Creamos el Widget utilizando el mundo actual y la clase seleccionada
+        UUserWidget* HUDInstancia = CreateWidget<UUserWidget>(GetWorld(), ClaseHUD);
+
+        // 3. Si se creó correctamente, lo añadimos a la pantalla del jugador
+        if (HUDInstancia)
+        {
+            HUDInstancia->AddToViewport();
+        }
+    }
+}
